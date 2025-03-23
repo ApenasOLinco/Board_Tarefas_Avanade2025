@@ -4,8 +4,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Optional;
 
-import org.postgresql.PGStatement;
-
 import com.apenasolinco.board_tarefas_avanade_2025.persistence.entity.BoardEntity;
 
 import lombok.AllArgsConstructor;
@@ -16,13 +14,13 @@ public class BoardDAO {
 	private final Connection connection;
 
 	public BoardEntity insert(final BoardEntity entity) throws SQLException {
-		var sql = "INSERT INTO Boards (name) VALUES (?)";
+		var sql = "INSERT INTO Boards (name) VALUES (?) RETURNING id";
 		try (var statement = connection.prepareStatement(sql)) {
 			statement.setString(1, entity.getName());
-			statement.executeUpdate();
+			var resultSet = statement.executeQuery();
 			
-			if(statement instanceof PGStatement pgstatement) {
-				var id = pgstatement.getLastOID();
+			if(resultSet.next()) {
+				var id = resultSet.getLong("id");
 				entity.setId(id);
 			}
 			

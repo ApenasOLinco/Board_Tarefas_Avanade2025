@@ -24,6 +24,8 @@ public class BoardQueryService {
 		if(optional.isPresent()) {
 			var entity = optional.get();
 			entity.setColumns(boardColumnDao.findByBoardId(entity.getId()));
+			
+			return Optional.of(entity);
 		}
 		
 		return Optional.empty();
