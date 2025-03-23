@@ -1,10 +1,10 @@
-package com.apenasolinco.board_tarefas_avanade_2025.ui;
-
-import java.sql.SQLException;
+package com.apenasolinco.board_tarefas_avanade_2025.ui;import java.sql.SQLException;
 import java.util.Scanner;
 
 import com.apenasolinco.board_tarefas_avanade_2025.persistence.config.ConnectionConfig;
+import com.apenasolinco.board_tarefas_avanade_2025.persistence.entity.BoardColumnEntity;
 import com.apenasolinco.board_tarefas_avanade_2025.persistence.entity.BoardEntity;
+import com.apenasolinco.board_tarefas_avanade_2025.service.BoardColumnQueryService;
 import com.apenasolinco.board_tarefas_avanade_2025.service.BoardQueryService;
 
 import lombok.AllArgsConstructor;
@@ -76,15 +76,42 @@ public class BoardMenu {
 			boardDetailsOptional.ifPresent(b -> {
 				System.out.printf("Board [%s, %s]\n", b.id(), b.name());
 				b.columns().forEach(c -> {
-					System.out.printf("Coluna [%s]; Tipo: [%s]; Tem: %s card(s)\n", c.name(), c.kind(),
+					System.out.printf(
+							"Coluna [%s]; Tipo: [%s]; Tem: %s card(s)\n", 
+							c.name(), 
+							c.kind(),
 							c.cardsAmount());
 				});
 			});
 		}
 	}
 
-	private void showColumn() {
-
+	private void showColumn() throws SQLException {
+		var columnsIds = entity.getColumns().stream().map(BoardColumnEntity::getId).toList();
+		
+		var selectedColumn = -1L;
+		while(!columnsIds.contains(selectedColumn)) {
+			System.out.printf("Escolha uma coluna do board %s\n", entity.getName());
+			entity.getColumns().forEach(c -> System.out.printf("%s - %s [%s]\n", c.getId(), c.getName(), c.getKind()));
+			
+			selectedColumn = Long.parseLong(scanner.nextLine());
+		}
+		
+		try (var connection = ConnectionConfig.getConnection()) {
+			var service = new BoardColumnQueryService(connection);
+			var optional = service.findById(selectedColumn);
+			
+			optional.ifPresent(col -> {
+				System.out.printf("Coluna %s; Tipo: %s;\n", col.getName(), col.getKind());
+				col.getCards().forEach(card -> {
+					System.out.printf("Card %s: %s\n%s\n",
+							card.getId(), 
+							card.getTitle(), 
+							card.getDescription()
+					);
+				});
+			});
+		}
 	}
 
 	private void showCard() {
@@ -92,3 +119,34 @@ public class BoardMenu {
 	}
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
