@@ -1,8 +1,11 @@
 package com.apenasolinco.board_tarefas_avanade_2025.ui;
 
+import java.sql.SQLException;
 import java.util.Scanner;
 
+import com.apenasolinco.board_tarefas_avanade_2025.persistence.config.ConnectionConfig;
 import com.apenasolinco.board_tarefas_avanade_2025.persistence.entity.BoardEntity;
+import com.apenasolinco.board_tarefas_avanade_2025.service.BoardQueryService;
 
 import lombok.AllArgsConstructor;
 
@@ -18,60 +21,74 @@ public class BoardMenu {
 
 		var option = -1;
 
-		while (true) {
-			System.out.println("1 - Criar um Card");
-			System.out.println("2 - Mover um Card");
-			System.out.println("3 - Bloquear um Card");
-			System.out.println("4 - Desbloquear um Card");
-			System.out.println("5 - Cancelar um Card");
-			System.out.println("6 - Visualizar Board");
-			System.out.println("7 - Visualizar coluna com Cards");
-			System.out.println("8 - Visualizar um Card");
-			System.out.println("9 - Voltar ao menu anterior");
-			System.out.println("10 - Sair");
+		try {
+			while (true) {
+				System.out.println("1 - Criar um Card");
+				System.out.println("2 - Mover um Card");
+				System.out.println("3 - Bloquear um Card");
+				System.out.println("4 - Desbloquear um Card");
+				System.out.println("5 - Cancelar um Card");
+				System.out.println("6 - Visualizar Board");
+				System.out.println("7 - Visualizar coluna com Cards");
+				System.out.println("8 - Visualizar um Card");
+				System.out.println("9 - Voltar ao menu anterior");
+				System.out.println("10 - Sair");
 
-			option = Integer.parseInt(scanner.nextLine());
+				option = Integer.parseInt(scanner.nextLine());
 
-			switch (option) {
-				case 1 -> moveCard();
-				case 2 -> moveCard();
-				case 3 -> unblockCard();
-				case 4 -> unblockCard();
-				case 5 -> cancelCard();
-				case 6 -> showBoard();
-				case 7 -> showColumn();
-				case 8 -> showCard();
-				case 9 -> {
-					return;
+				switch (option) {
+					case 1 -> moveCard();
+					case 2 -> moveCard();
+					case 3 -> unblockCard();
+					case 4 -> unblockCard();
+					case 5 -> cancelCard();
+					case 6 -> showBoard();
+					case 7 -> showColumn();
+					case 8 -> showCard();
+					case 9 -> {
+						return;
+					}
+					case 10 -> System.exit(0);
+					default -> System.out.println("Opção inválida.");
 				}
-				case 10 -> System.exit(0);
-				default -> System.out.println("Opção inválida.");
 			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
 	}
 
 	private void moveCard() {
-		
+
 	}
 
 	private void unblockCard() {
-		
+
 	}
 
 	private void cancelCard() {
-		
+
 	}
 
-	private void showBoard() {
-		
+	private void showBoard() throws SQLException {
+		try (var connection = ConnectionConfig.getConnection()) {
+			var boardDetailsOptional = new BoardQueryService(connection).showBoardDetails(entity.getId());
+
+			boardDetailsOptional.ifPresent(b -> {
+				System.out.printf("Board [%s, %s]\n", b.id(), b.name());
+				b.columns().forEach(c -> {
+					System.out.printf("Coluna [%s]; Tipo: [%s]; Tem: %s card(s)\n", c.name(), c.kind(),
+							c.cardsAmount());
+				});
+			});
+		}
 	}
 
 	private void showColumn() {
-		
+
 	}
 
 	private void showCard() {
-		
+
 	}
 
 }
