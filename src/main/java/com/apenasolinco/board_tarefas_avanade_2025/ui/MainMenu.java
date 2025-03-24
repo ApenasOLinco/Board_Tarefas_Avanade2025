@@ -104,7 +104,7 @@ public class MainMenu {
 
 		try (var connection = getConnection()) {
 			var service = new BoardService(connection);
-
+			
 			if (service.delete(id)) {
 				System.out.println("Board deletado com sucesso.");
 			} else {

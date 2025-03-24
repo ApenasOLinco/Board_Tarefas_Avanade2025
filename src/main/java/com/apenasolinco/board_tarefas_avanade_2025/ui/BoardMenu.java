@@ -101,8 +101,8 @@ public class BoardMenu {
 			var service = new BoardColumnQueryService(connection);
 			var optional = service.findById(selectedColumn);
 			
-			optional.ifPresent(col -> {
-				System.out.printf("Coluna %s; Tipo: %s;\n", col.getName(), col.getKind());
+			optional.ifPresentOrElse(col -> {
+				System.out.printf("Coluna %s; Tipo: %s;\n", col.getName(), col.getKind());  
 				col.getCards().forEach(card -> {
 					System.out.printf("Card %s: %s\n%s\n",
 							card.getId(), 
@@ -110,7 +110,7 @@ public class BoardMenu {
 							card.getDescription()
 					);
 				});
-			});
+			}, () -> System.out.println("Essa coluna não tem nenhum card."));
 		}
 	}
 
