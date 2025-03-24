@@ -65,13 +65,13 @@ public class MainMenu {
 		// Coluna final
 		System.out.println("Informe o nome da coluna final do Board: ");
 		var finalColName = scanner.nextLine();
-		var finalCol = createColumnEntity(finalColName, BoardColumnKind.FINAL, columns.size());
+		var finalCol = createColumnEntity(finalColName, BoardColumnKind.FINAL, extraCols + 1);
 		columns.add(finalCol);
 
 		// Coluna cancelamento
 		System.out.println("Informe o nome da coluna de cancelamento do Board: ");
 		var cancelColName = scanner.nextLine();
-		var cancelCol = createColumnEntity(cancelColName, BoardColumnKind.FINAL, columns.size() + 1);
+		var cancelCol = createColumnEntity(cancelColName, BoardColumnKind.FINAL, extraCols + 2);
 		columns.add(cancelCol);
 
 		entity.setColumns(columns);
