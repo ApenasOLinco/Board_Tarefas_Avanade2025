@@ -116,14 +116,14 @@ public class BoardColumnDAO {
 		var sql =
 			"""
 			SELECT
-				bc.name, 
-				bc.kind,
-				c.id,
-				c.title,
-				c.description
+				bc.name as bc_name, 
+				bc.kind as bc_kind,
+				c.id as card_id,
+				c.title as card_title,
+				c.description as card_desc
 			FROM 
 				Boards_Columns bc
-			INNER JOIN
+			LEFT JOIN
 				Cards c
 			ON
 				c.board_column_id = bc.id
@@ -138,14 +138,14 @@ public class BoardColumnDAO {
 
 			if (resultSet.next()) {
 				var entity = new BoardColumnEntity();
-				entity.setName(resultSet.getString("bc.name"));
-				entity.setKind(BoardColumnKind.valueOf(resultSet.getString("bc.kind")));
+				entity.setName(resultSet.getString("bc_name"));
+				entity.setKind(BoardColumnKind.valueOf(resultSet.getString("bc_kind")));
 				
 				do {
 					var card = new CardEntity();
-					card.setId(resultSet.getLong("c.id"));
-					card.setTitle(resultSet.getString("c.title"));
-					card.setDescription(resultSet.getString("c.description"));
+					card.setId(resultSet.getLong("card_id"));
+					card.setTitle(resultSet.getString("card_title"));
+					card.setDescription(resultSet.getString("card_desc"));
 					
 					entity.getCards().add(card);
 				} while(resultSet.next());
