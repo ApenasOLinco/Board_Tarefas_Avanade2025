@@ -10,9 +10,17 @@ import lombok.NoArgsConstructor;
 public final class ConnectionConfig {
 	
 	public static Connection getConnection() throws SQLException {
-		var url = "jdbc:postgresql://localhost/board";
-		var user = "postgres";
-		var password = "postgres";
+		var environment = System.getenv();
+		
+		// Build URL
+		var dbEnvr = environment.get("DBENV");
+		var dbHost = environment.get("DBHOST");
+		var dbPort = environment.get("DBPORT");
+		var dbName = environment.get("DBNAME");
+		var url = "jdbc:%s://%s:%s/%s".formatted(dbEnvr, dbHost, dbPort, dbName);
+		
+		var user = environment.get("DBUSER");
+		var password = environment.get("DBPASSWORD");
 		var connection = DriverManager.getConnection(url, user, password);
 		connection.setAutoCommit(false);
 		
