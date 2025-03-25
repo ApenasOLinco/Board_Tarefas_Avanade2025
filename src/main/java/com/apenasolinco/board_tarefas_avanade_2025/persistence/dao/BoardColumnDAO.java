@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.postgresql.jdbc.PgStatement;
@@ -63,34 +64,34 @@ public class BoardColumnDAO {
 
 	}
 
-	public List<BoardColumnDTO> findByBoardIdWithDetails(final Long board_id) throws SQLException {
+	public List<BoardColumnDTO> findByBoardIdWithDetails(final Long boardId) throws SQLException {
 		List<BoardColumnDTO> dtos = new ArrayList<>();
-		
-		var sql = """
-				SELECT
-					bc.id,
-					bc.name,
-					bc.kind,
-					COUNT(
-						c.id
-					) AS cards_amount
-				FROM
-					Boards_Columns bc
-				LEFT JOIN
-					Cards c
-				ON
-					c.board_column_id = bc.id
-				WHERE
-					board_id = ?
-				GROUP BY
-					bc.id,
-					bc.name,
-					bc.order_,
-					bc.kind
-				""";
+		// @formatter:off
+		var sql = 
+			"""
+			SELECT
+				bc.id,
+				bc.name,
+				bc.kind,
+				(
+					SELECT 
+						COUNT(c.id)
+					FROM
+						Cards c
+					WHERE
+						c.board_column_id = bc.id
+				) AS cards_amount
+			FROM
+				Boards_Columns bc
+			WHERE
+				board_id = ?
+			ORDER BY
+				order_
+			""";
+		// @formatter:on
 
 		try (var statement = connection.prepareStatement(sql)) {
-			statement.setLong(1, board_id);
+			statement.setLong(1, boardId);
 			var resultSet = statement.executeQuery();
 
 			while (resultSet.next()) {
@@ -142,6 +143,9 @@ public class BoardColumnDAO {
 				entity.setKind(BoardColumnKind.valueOf(resultSet.getString("bc_kind")));
 				
 				do {
+					if(Objects.isNull(resultSet.getString("card_title")))
+						break;
+					
 					var card = new CardEntity();
 					card.setId(resultSet.getLong("card_id"));
 					card.setTitle(resultSet.getString("card_title"));
