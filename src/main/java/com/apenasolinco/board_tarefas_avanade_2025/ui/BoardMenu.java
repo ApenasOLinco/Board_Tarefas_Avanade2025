@@ -6,6 +6,7 @@ import com.apenasolinco.board_tarefas_avanade_2025.persistence.entity.BoardColum
 import com.apenasolinco.board_tarefas_avanade_2025.persistence.entity.BoardEntity;
 import com.apenasolinco.board_tarefas_avanade_2025.service.BoardColumnQueryService;
 import com.apenasolinco.board_tarefas_avanade_2025.service.BoardQueryService;
+import com.apenasolinco.board_tarefas_avanade_2025.service.CardQueryService;
 
 import lombok.AllArgsConstructor;
 
@@ -114,8 +115,13 @@ public class BoardMenu {
 		}
 	}
 
-	private void showCard() {
-
+	private void showCard() throws SQLException {
+		System.out.println("Informe o id do card que deseja visualizar:");
+		var selectedId = Long.parseLong(scanner.nextLine());
+		
+		try(var connection = ConnectionConfig.getConnection()) {
+			new CardQueryService().findById(selectedId)
+		}
 	}
 
 }
