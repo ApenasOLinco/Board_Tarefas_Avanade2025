@@ -13,6 +13,6 @@ public class BlockEntity {
 	private String createdReason;
 	private LocalDateTime closedAt;
 	private String closedReason;
-	private CardEntity card;
+	private CardEntity card = new CardEntity();
 
 }

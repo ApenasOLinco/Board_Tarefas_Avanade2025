@@ -132,8 +132,21 @@ public class BoardMenu {
 
 	}
 
-	private void unblockCard() {
-
+	private void unblockCard() throws SQLException {
+		System.out.println("Informe o id do card a ser desbloqueado:");
+		var cardId = Long.parseLong(scanner.nextLine());
+		
+		System.out.println("Informe o motivo do desbloqueio do card:");
+		var reason = scanner.nextLine();
+		
+		try (var connection = ConnectionConfig.getConnection()) {
+			var cardService = new CardService(connection);
+			
+			cardService.unblock(cardId, reason);
+			System.out.println("Card de id %s desbloqueado!".formatted(cardId));
+		} catch(RuntimeException ex) {
+			System.err.println(ex.getMessage());
+		}
 	}
 
 	private void cancelCard() throws SQLException {
@@ -148,7 +161,7 @@ public class BoardMenu {
 
 		try {
 			var service = new CardService(ConnectionConfig.getConnection());
-			service.cancelCard(cardId, cancelColumn.getId(), boardColumnsInfo);
+			service.cancel(cardId, cancelColumn.getId(), boardColumnsInfo);
 			System.out.println("Card de id %s cancelado!".formatted(cardId));
 		} catch (RuntimeException ex) {
 			System.err.println(ex.getMessage());
