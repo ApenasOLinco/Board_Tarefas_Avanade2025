@@ -46,7 +46,7 @@ public class BoardMenu {
 				switch (option) {
 					case 1 -> createCard();
 					case 2 -> moveCard();
-					case 3 -> unblockCard();
+					case 3 -> blockCard();
 					case 4 -> unblockCard();
 					case 5 -> cancelCard();
 					case 6 -> showBoard();
@@ -95,33 +95,64 @@ public class BoardMenu {
 		System.out.println("Insira o id do card a ser movido para a próxima coluna:");
 		var cardId = Long.parseLong(scanner.nextLine());
 
-		// @formatter:off
-		var boardColumnsInfo = 
-			entity.getColumns().stream()
-				.map(bc -> 
-					new BoardColumnInfoDTO(
-						bc.getId(),
-						bc.getOrder(),
-						bc.getKind()
-					)
-				)
-			.toList();
-		// @formatter:on
+		var boardColumnsInfo = entity.getColumns()
+				.stream()
+				.map(bc -> new BoardColumnInfoDTO(bc.getId(), bc.getOrder(), bc.getKind()))
+				.toList();
 
 		try (var connection = ConnectionConfig.getConnection()) {
 			var service = new CardService(connection);
 			service.moveToNextColumn(cardId, boardColumnsInfo);
-		} catch(RuntimeException ex) {
+			System.out.println("Card de id %s movido!".formatted(cardId));
+		} catch (RuntimeException ex) {
 			System.err.println(ex.getMessage());
 		}
+	}
+
+	private void blockCard() throws SQLException {
+
+		System.out.println("Informe o id do card a ser bloqueado:");
+		var cardId = Long.parseLong(scanner.nextLine());
+
+		System.out.println("Informe o motivo do bloqueio do card:");
+		var reason = scanner.nextLine();
+
+		try (var connection = ConnectionConfig.getConnection()) {
+			var cardService = new CardService(connection);
+			var columnsInfo = entity.getColumns()
+					.stream()
+					.map(bc -> new BoardColumnInfoDTO(bc.getId(), bc.getOrder(), bc.getKind()))
+					.toList();
+			
+			cardService.block(cardId, reason, columnsInfo);
+			System.out.println("Card de id %s bloqueado!".formatted(cardId));
+		} catch (RuntimeException ex) {
+			System.err.println(ex.getMessage());
+		}
+
 	}
 
 	private void unblockCard() {
 
 	}
 
-	private void cancelCard() {
+	private void cancelCard() throws SQLException {
+		System.out.println("Informe o id do card a ser movido para a coluna de cancelamento:");
+		var cardId = Long.parseLong(scanner.nextLine());
+		var cancelColumn = entity.getCancelColumn();
 
+		var boardColumnsInfo = entity.getColumns()
+				.stream()
+				.map(bc -> new BoardColumnInfoDTO(bc.getId(), bc.getOrder(), bc.getKind()))
+				.toList();
+
+		try {
+			var service = new CardService(ConnectionConfig.getConnection());
+			service.cancelCard(cardId, cancelColumn.getId(), boardColumnsInfo);
+			System.out.println("Card de id %s cancelado!".formatted(cardId));
+		} catch (RuntimeException ex) {
+			System.err.println(ex.getMessage());
+		}
 	}
 
 	private void showBoard() throws SQLException {

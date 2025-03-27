@@ -17,6 +17,17 @@ public class BoardEntity {
 	@EqualsAndHashCode.Exclude
 	private List<BoardColumnEntity> columns = new ArrayList<>();
 	
+	public BoardColumnEntity getInicialColumn() {
+		return getFirstColumnOfKind(BoardColumnKind.INITIAL);
+	}
+	
+	public BoardColumnEntity getCancelColumn() {
+		return getFirstColumnOfKind(BoardColumnKind.CANCELED);
+	}
+	
+	private BoardColumnEntity getFirstColumnOfKind(BoardColumnKind kind) {
+		return columns.stream().filter(c -> c.getKind().equals(kind)).findFirst().orElseThrow();
+	}
 }
 
 

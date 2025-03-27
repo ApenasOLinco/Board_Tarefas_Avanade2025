@@ -16,4 +16,7 @@ public final class LocalDateTimeConverter {
 		return Objects.isNull(timestamp) ? null : LocalDateTime.ofInstant(timestamp.toInstant(), UTC);
 	}
 
+	public static Timestamp toTimestamp(LocalDateTime dateTime) {
+		return Objects.isNull(dateTime) ? null : Timestamp.valueOf(dateTime);
+	}
 }
